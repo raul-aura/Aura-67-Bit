@@ -5,6 +5,7 @@ public class PlayerAnimation : MonoBehaviour
     private Animator playerAnimator;
 
     private string paramIsMoving = "is Moving";
+    private string paramIsAttacking = "is Punching";
 
     void Start()
     {
@@ -14,5 +15,10 @@ public class PlayerAnimation : MonoBehaviour
     public void SetIsMoving(bool isMoving)
     {
         playerAnimator.SetBool(paramIsMoving, isMoving);
+    }
+
+    public void SetIsAttacking(bool isAttacking)
+    {
+        playerAnimator.SetBool(paramIsAttacking, isAttacking);
     }
 }

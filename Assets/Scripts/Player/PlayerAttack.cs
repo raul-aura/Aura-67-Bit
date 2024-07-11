@@ -3,26 +3,34 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    [SerializeField] private float attackCooldown = 0.3f;
-    private float cooldownElapsed = 0;
-    private bool canAttack = true;
+    [Header("Class References")]
+    [SerializeField] private PlayerAnimation playerAnimationRef;
+    [SerializeField] private PlayerGrab playerGrabRef;
+
+    [SerializeField] private float attackForce = 10f;
+    private const float attackRelease = 0.5f;
+    private float attackTime = 0;
 
     private List<GameObject> enemiesInRange = new List<GameObject>();
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.E))
+        if(Input.GetKeyUp(KeyCode.Q))
+        {
+            Grab();
+        }
+
+        if(Input.GetKey(KeyCode.E))
         {
             Attack();
         }
-        if (!canAttack)
+        if (attackTime < attackRelease)
         {
-            cooldownElapsed += Time.deltaTime;
-            if (cooldownElapsed >= attackCooldown)
-            {
-                canAttack = true;
-                cooldownElapsed = 0;
-            }
+            attackTime += Time.deltaTime;
+        }
+        else
+        {
+            playerAnimationRef.SetIsAttacking(false);
         }
     }
 
@@ -30,8 +38,9 @@ public class PlayerAttack : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            GameObject enemy = other.gameObject;
+            GameObject enemy = other.transform.parent.gameObject;
             enemiesInRange.Add(enemy);
+            Debug.Log(enemy);
         }
     }
 
@@ -39,20 +48,30 @@ public class PlayerAttack : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            GameObject enemy = other.gameObject;
+            GameObject enemy = other.transform.parent.gameObject;
             enemiesInRange.Remove(enemy);
         }
     }
 
     public void Attack()
     {
-        if (canAttack)
+        attackTime = 0;
+        playerAnimationRef.SetIsAttacking(true);
+        foreach (GameObject enemy in enemiesInRange)
         {
-            foreach (GameObject enemy in enemiesInRange)
+            enemy.GetComponent<EnemyBehaviour>().ReceiveAttack(transform.forward, attackForce * Time.deltaTime);
+        }
+    }
+
+    public void Grab()
+    {
+        foreach (GameObject enemy in enemiesInRange)
+        {
+            if(enemy.GetComponent<EnemyBehaviour>().GetIsDead())
             {
-                enemy.GetComponentInParent<EnemyBehaviour>().ReceiveAttack(transform.forward);
+                enemy.GetComponent<EnemyBehaviour>().DisableRaggdoll();
+                playerGrabRef.GrabEnemy(enemy);
             }
-            canAttack = false;
         }
     }
 }

@@ -4,12 +4,14 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Class References")]
     [SerializeField] private PlayerAnimation playerAnimationRef;
+    [SerializeField] private PlayerGrab playerGrabRef;
 
     private Rigidbody playerRigidbody;
 
     [Header("Input References")]
     [SerializeField] private RectTransform inputPanel;
     [SerializeField] private Transform inputButton;
+    [SerializeField] private float limitOffset = 75f;
 
     private Vector2 inputButtonInitialPos;
     private Vector2 inputButtonLimit;
@@ -64,16 +66,19 @@ public class PlayerMovement : MonoBehaviour
         if (isPlayerTouch)
         {
             Vector2 touchDistance = touchEnd - touchStart;
-            Vector2 direction = Vector2.ClampMagnitude(touchDistance, 1.0f);
-            Vector2 touchButton = Vector2.ClampMagnitude(touchDistance, inputButtonLimit.magnitude);
-            Move(new Vector3(direction.x, 0, direction.y));
-            if (playerAnimationRef)
+            if (touchDistance != Vector2.zero)
             {
-                playerAnimationRef.SetIsMoving(true);
-            }
-            if (inputButton)
-            {
-                inputButton.position = new Vector2(inputButtonInitialPos.x + touchButton.x, inputButtonInitialPos.y + touchButton.y);
+                Vector2 direction = Vector2.ClampMagnitude(touchDistance, 1.0f);
+                Vector2 touchButton = Vector2.ClampMagnitude(touchDistance, inputButtonLimit.magnitude - limitOffset);
+                Move(new Vector3(direction.x, 0, direction.y));
+                if (playerAnimationRef)
+                {
+                    playerAnimationRef.SetIsMoving(true);
+                }
+                if (inputButton)
+                {
+                    inputButton.position = new Vector2(inputButtonInitialPos.x + touchButton.x, inputButtonInitialPos.y + touchButton.y);
+                }
             }
         }
         else
@@ -93,10 +98,12 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 moveDirection = movementSpeed * Time.deltaTime * direction.normalized;
         playerRigidbody.MovePosition(playerRigidbody.position + moveDirection);
+        playerGrabRef.MoveGrabbed(moveDirection);
         if (moveDirection != Vector3.zero)
         {
            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
            playerRigidbody.MoveRotation(Quaternion.Slerp(playerRigidbody.rotation, targetRotation, rotationSpeed * Time.deltaTime));
+           playerGrabRef.RotateGrabbed(moveDirection);
         }
     }
 }
