@@ -1,0 +1,5 @@
+D:/hcrau/Projects/Unity/67 Bit Test/Aura-67-Bit/.utmp/RelWithDebInfo/1p6m4n62/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/hcrau/Projects/Unity/67 Bit Test/Aura-67-Bit/.utmp/RelWithDebInfo/1p6m4n62/arm64-v8a/CMakeFiles/rebuild_cache.dir
+D:/hcrau/Projects/Unity/67 Bit Test/Aura-67-Bit/.utmp/RelWithDebInfo/1p6m4n62/arm64-v8a/FramePacing/CMakeFiles/swappywrapper.dir
+D:/hcrau/Projects/Unity/67 Bit Test/Aura-67-Bit/.utmp/RelWithDebInfo/1p6m4n62/arm64-v8a/FramePacing/CMakeFiles/edit_cache.dir
+D:/hcrau/Projects/Unity/67 Bit Test/Aura-67-Bit/.utmp/RelWithDebInfo/1p6m4n62/arm64-v8a/FramePacing/CMakeFiles/rebuild_cache.dir

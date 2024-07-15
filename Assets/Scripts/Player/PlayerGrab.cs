@@ -3,12 +3,19 @@ using UnityEngine;
 
 public class PlayerGrab : MonoBehaviour
 {
-    [SerializeField] private float heightOffsetAdditive = 1f;
-    private float heightOffset;
+    [SerializeField] protected uint initialMaxGrabs = 2;
+    protected uint maxGrabs;
+    [SerializeField] protected float heightOffsetAdditive = 1f;
+    protected float heightOffset;
 
-    private List<GameObject> grabbedEnemies = new List<GameObject>();
+    protected List<GameObject> grabbedEnemies = new List<GameObject>();
 
-    public void MoveGrabbed(Vector3 playerMove)
+    virtual protected void Start()
+    {
+        maxGrabs = initialMaxGrabs;
+    }
+
+    virtual public void MoveGrabbed(Vector3 playerMove)
     {
         if(grabbedEnemies.Count > 0)
         {
@@ -25,7 +32,7 @@ public class PlayerGrab : MonoBehaviour
         }
     }
 
-    public void RotateGrabbed(Vector3 playerRotation)
+    virtual public void RotateGrabbed(Vector3 playerRotation)
     {
         if (grabbedEnemies.Count > 0)
         {
@@ -42,15 +49,42 @@ public class PlayerGrab : MonoBehaviour
         }
     }
 
-    public void GrabEnemy(GameObject enemy)
+    virtual public void GrabEnemy(GameObject enemy, EnemyBehaviour behaviour)
     {
-        if (!grabbedEnemies.Contains(enemy))
+        if (!grabbedEnemies.Contains(enemy) && grabbedEnemies.Count < maxGrabs)
         {
             enemy.transform.Rotate(90f, 0f, 0f);
+            if (behaviour)
+            {
+                behaviour.DisableRaggdoll();
+            }
             Vector3 newPosition = transform.position + Vector3.up * (GetComponent<Collider>().bounds.size.y + heightOffset);
             enemy.transform.position = newPosition;
             heightOffset += heightOffsetAdditive;
             grabbedEnemies.Add(enemy);
         }
+    }
+
+    virtual public void ReleaseEnemy()
+    {
+        if (grabbedEnemies.Count > 0)
+        {
+            foreach (GameObject enemy in grabbedEnemies)
+            {
+                EnemyBehaviour behaviour = enemy.GetComponent<EnemyBehaviour>();
+                if (behaviour)
+                {
+                    behaviour.ReceiveAttack(transform.forward, 200f);
+                }
+                enemy.transform.Rotate(-90f, 0f, 0f);
+            }
+            grabbedEnemies.Clear();
+            heightOffset = 0f;
+        }
+    }
+
+    virtual public void IncreaseMaxGrab(uint value)
+    {
+        maxGrabs += value;
     }
 }

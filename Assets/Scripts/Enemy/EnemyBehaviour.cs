@@ -2,21 +2,21 @@ using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour
 {
-    private Rigidbody[] enemyRagdoll;
-    private Collider enemyCollider;
+    protected Rigidbody[] enemyRagdoll;
+    protected Collider enemyCollider;
 
-    private Vector3 attackDirection = Vector3.zero;
-    private float attackImpulse;
+    protected Vector3 attackDirection = Vector3.zero;
+    protected float attackImpulse;
 
-    private bool isDead = false;
+    protected bool isDead = false;
 
-    void Start()
+    virtual protected void Start()
     {
         enemyRagdoll = GetComponentsInChildren<Rigidbody>();
         DisableRaggdoll();
     }
 
-    void ToggleRagdoll(bool isRagdoll)
+    virtual protected void ToggleRagdoll(bool isRagdoll)
     {
         foreach (Rigidbody body in enemyRagdoll)
         {
@@ -29,15 +29,15 @@ public class EnemyBehaviour : MonoBehaviour
         GetComponent<Animator>().enabled = !isRagdoll;
     }
 
-    public void ReceiveAttack(Vector3 attacker, float impulse = 10f)
+    virtual public void ReceiveAttack(Vector3 attacker, float impulse = 100f)
     {
         isDead = true;
         attackDirection = attacker;
-        attackImpulse = impulse;
+        attackImpulse = impulse * Time.deltaTime;
         ToggleRagdoll(true);
     }
 
-    public void DisableRaggdoll()
+    virtual public void DisableRaggdoll()
     {
         ToggleRagdoll(false);
     }

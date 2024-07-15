@@ -2,23 +2,41 @@ using UnityEngine;
 
 public class PlayerAnimation : MonoBehaviour
 {
-    private Animator playerAnimator;
+    protected Animator playerAnimator;
 
-    private string paramIsMoving = "is Moving";
-    private string paramIsAttacking = "is Punching";
+    protected string paramIsMoving = "is Moving";
+    protected string paramIsAttacking = "is Punching";
 
-    void Start()
+    virtual protected void Start()
     {
         playerAnimator = GetComponent<Animator>();
     }
 
-    public void SetIsMoving(bool isMoving)
+    virtual public void SetIsMoving(bool isMoving)
     {
+        if (!CheckAnimator())
+        {
+            return;
+        }
         playerAnimator.SetBool(paramIsMoving, isMoving);
     }
 
-    public void SetIsAttacking(bool isAttacking)
+    virtual public void SetIsAttacking(bool isAttacking)
     {
+        if (!CheckAnimator())
+        {
+            return;
+        }
         playerAnimator.SetBool(paramIsAttacking, isAttacking);
+    }
+
+    protected bool CheckAnimator()
+    {
+        if (!playerAnimator)
+        {
+            Debug.LogError("[PlayerAnimation] Reference of playerAnimator is EMPTY. Animations WILL NOT work.");
+            return false;
+        }
+        return true;
     }
 }

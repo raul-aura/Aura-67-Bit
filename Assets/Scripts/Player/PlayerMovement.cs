@@ -2,30 +2,30 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Class References")]
-    [SerializeField] private PlayerAnimation playerAnimationRef;
-    [SerializeField] private PlayerGrab playerGrabRef;
+    [Header("Class References")] //These references are not necessary for movement to work, therefore, no debug is needed.
+    [SerializeField] protected PlayerAnimation playerAnimationRef;
+    [SerializeField] protected PlayerGrab playerGrabRef;
 
-    private Rigidbody playerRigidbody;
+    protected Rigidbody playerRigidbody;
 
-    [Header("Input References")]
-    [SerializeField] private RectTransform inputPanel;
-    [SerializeField] private Transform inputButton;
-    [SerializeField] private float limitOffset = 75f;
+    [Header("Input References")] //These references are not necessary for movement to work, therefore, no debug is needed.
+    [SerializeField] protected RectTransform inputPanel;
+    [SerializeField] protected Transform inputButton;
+    [SerializeField] protected float limitOffset = 75f;
 
-    private Vector2 inputButtonInitialPos;
-    private Vector2 inputButtonLimit;
-    private bool isPlayerTouch = false;
-    private Vector2 touchStart;
-    private Vector2 touchEnd;
+    protected Vector2 inputButtonInitialPos;
+    protected Vector2 inputButtonLimit;
+    protected bool isPlayerTouch = false;
+    protected Vector2 touchStart;
+    protected Vector2 touchEnd;
 
     [Header("Parameters")]
-    [SerializeField] private float movementSpeed = 8f;
-    [SerializeField] private float rotationSpeed = 8f;
+    [SerializeField] protected float movementSpeed = 8f;
+    [SerializeField] protected float rotationSpeed = 8f;
 
-    private void Awake()
+    virtual protected void Awake()
     {
-        if(inputPanel)
+        if (inputPanel)
         {
             inputButtonLimit = new Vector2(inputPanel.rect.width / 2, inputPanel.rect.height / 2);
         }
@@ -35,16 +35,17 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Start()
+    virtual protected void Start()
     {
         playerRigidbody = GetComponent<Rigidbody>();
-        if (playerRigidbody)
+        if (!CheckRigidbody())
         {
-            playerRigidbody.freezeRotation = true;
+            return;
         }
+        playerRigidbody.freezeRotation = true;
     }
 
-    void Update()
+    virtual protected void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -61,7 +62,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    virtual protected void FixedUpdate()
     {
         if (isPlayerTouch)
         {
@@ -94,16 +95,33 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Move(Vector3 direction)
+    virtual protected void Move(Vector3 direction)
     {
         Vector3 moveDirection = movementSpeed * Time.deltaTime * direction.normalized;
+        if (!CheckRigidbody())
+        {
+            return;
+        }
         playerRigidbody.MovePosition(playerRigidbody.position + moveDirection);
-        playerGrabRef.MoveGrabbed(moveDirection);
         if (moveDirection != Vector3.zero)
         {
            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
            playerRigidbody.MoveRotation(Quaternion.Slerp(playerRigidbody.rotation, targetRotation, rotationSpeed * Time.deltaTime));
-           playerGrabRef.RotateGrabbed(moveDirection);
+           if (playerGrabRef)
+           {
+                playerGrabRef.MoveGrabbed(moveDirection);
+                playerGrabRef.RotateGrabbed(moveDirection);
+           }
         }
+    }
+
+    protected bool CheckRigidbody()
+    {
+        if(!playerRigidbody)
+        {
+            Debug.LogError("[PlayerMovement] No Rigidbody detected, movement WILL NOT work.");
+            return false;
+        }
+        return true;
     }
 }
