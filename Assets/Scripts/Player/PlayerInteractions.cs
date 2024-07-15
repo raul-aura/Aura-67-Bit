@@ -63,7 +63,11 @@ public class PlayerInteractions : MonoBehaviour
         playerAnimationRef.SetIsAttacking(true);
         foreach (GameObject enemy in enemiesInRange)
         {
-            enemy.GetComponent<EnemyBehaviour>().ReceiveAttack(transform.forward, attackForce);
+            EnemyBehaviour enemyBehaviour = enemy.GetComponent<EnemyBehaviour>();
+            if (!enemyBehaviour.GetIsDead())
+            {
+                enemyBehaviour.ReceiveAttack(transform.forward, attackForce);
+            }
         }
     }
 

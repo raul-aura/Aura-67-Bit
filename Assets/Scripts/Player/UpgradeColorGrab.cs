@@ -10,12 +10,12 @@ public class UpgradeColorGrab : PlayerUpgrades
     [Header("Upgrade")]
     [SerializeField] protected uint upgradeGrabAmount = 2;
     [SerializeField] protected Color upgradeColor = Color.white;
-    protected SkinnedMeshRenderer[] meshes;
+    protected SkinnedMeshRenderer mesh;
 
     protected override void Start()
     {
         base.Start();
-        meshes = GetComponentsInChildren<SkinnedMeshRenderer>();
+        mesh = GetComponentInChildren<SkinnedMeshRenderer>();
     }
 
     public override void Upgrade()
@@ -23,10 +23,7 @@ public class UpgradeColorGrab : PlayerUpgrades
         if (playerMoneyRef.RemoveMoney(upgradeValue))
         {
             playerGrabRef.IncreaseMaxGrab(upgradeGrabAmount);
-            foreach (SkinnedMeshRenderer mesh in meshes)
-            {
-                mesh.material.color = upgradeColor;
-            }
+            mesh.material.color = upgradeColor;
         }
     }
 }
